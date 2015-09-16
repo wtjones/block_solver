@@ -2,7 +2,6 @@
 class PermutationBuilder():
 
     def __buildPermutations(self, level, things, permutation, result):
-        result1 = []
         if level < len(things):
             thing = things[level]
             for i in range(0, len(thing)):
@@ -13,7 +12,6 @@ class PermutationBuilder():
                     result.append(p)
                 else:
                     self.__buildPermutations(level + 1, things, p, result)
-
 
     def getPermutations(self, items):
         result = []
