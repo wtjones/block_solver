@@ -1,6 +1,6 @@
-from operator import itemgetter, attrgetter, methodcaller
-import hashlib
-import BoardLoader as boardLoader
+from operator import itemgetter
+import copy
+from board_loader import *
 from shapes import shapes
 from permutations import *
 from matrix_math import *
@@ -8,16 +8,17 @@ from matrix_math import *
 matrixMath = MatrixMath()
 boardMax = 3
 
-b1 = boardLoader.GetBoard()
+boardLoader = BoardLoader()
+b1 = boardLoader.getBoard('tests/board-test.json')
 
 # For every cell within the board bounds, apply each rotation of every shape.
-# Any rotations that fit within the board are added to the transforms array.
+# Rotations that fit within the board are added to the transforms array.
 
 for shape in shapes:
     st = {}
-    for tz in range(0, boardMax):
-        for ty in range(0, boardMax):
-            for tx in range(0, boardMax):
+    for tz in range(0, b1.zMax):
+        for ty in range(0, b1.yMax):
+            for tx in range(0, b1.xMax):
                 for rotation in matrixMath.rotations:
                     m = matrixMath.applyTranslationToMatrix(
                         rotation, tx, ty, tz
@@ -35,7 +36,7 @@ for shape in shapes:
                                 p[1] < boardMax and
                                 p[2] < boardMax):
 
-                            if b1[p[0], p[1], p[2]] == 0:
+                            if b1.cells[p[0], p[1], p[2]] == 0:
                                 valid = False
                         else:
                             valid = False
@@ -55,6 +56,10 @@ for shape in shapes:
     print 'shape transforms: ' + str(len(st))
 
 
+# Build a list of possible permutations. 
+# Of each permutation: 
+#   First index is the index of the shape
+#   Second index is the index of the shape transform.
 permutationInput = []
 
 for shapeIndex in range(0, len(shapes)):
@@ -74,10 +79,10 @@ print len(boardPermutations)
 
 solved = False
 permIndex = 0
-while solved == False and permIndex < len(boardPermutations):
+while not solved and permIndex < len(boardPermutations):
     permutation = boardPermutations[permIndex]
 
-    workBoard = np.copy(b1)
+    workBoard = copy.deepcopy(b1) #np.copy(b1)
     validShapes = 0
     for shapePosition in permutation:
         shape = shapes[shapePosition[0]]
@@ -88,59 +93,26 @@ while solved == False and permIndex < len(boardPermutations):
         valid = True
         for sp in shape['points']:
             p = matrixMath.transformPoint(sp, m)
-            
+
             if p[0] < boardMax and p[1] < boardMax and p[2] < boardMax:
-                if workBoard[p[0], p[1], p[2]] != 8:
+                if workBoard.cells[p[0], p[1], p[2]] != 8:
                     valid = False
-            else: 
+            else:
                 valid = False
             tempPoints.append(p)
+
         if valid:
             validShapes += 1
 
             for p in tempPoints:
                 print p
-                workBoard[p[0], p[1], p[2]] = shapePosition[0] + 1
-
+                # mark the cells of the working board with the
+                # index of the current shape + 1
+                workBoard.cells[p[0], p[1], p[2]] = shapePosition[0] + 1
 
     if validShapes == len(shapes):
         print 'all valid'
 
-        print boardLoader.PrettyPrint(workBoard, boardMax, boardMax, boardMax)
+        print workBoard.prettyPrint()
 
     permIndex += 1
-
-
-    
-
-
-# for shapeOuter in range(0, len(shapes)):
-#   workBoard = np.copy(b1)
-#   valid = True
-#   for transOuter in range(0, len(shapes[shapeOuter]['transforms'])):
-#       #print shapeOuter
-#       #print transOuter
-
-#       shape = shapes[shapeOuter]
-#       m = shape['transforms'][transOuter]
-#       print 'matrix'
-#       print m
-#       valid = True
-#       tempPoints = []
-#       for sp in shape['points']:
-#           p = transformPoint(sp, m)
-#           print 'tranformed..'
-#           print p
-#           if p[0] < boardMax and p[1] < boardMax and p[2] < boardMax:
-#               if workBoard[p[0], p[1], p[2]] == 0:
-#                   valid = False
-#               else: 
-#                   valid = False
-#           tempPoints.append(p)
-#       if valid:
-#           print 'valid'
-#           for p in tempPoints:
-#               workBoard[p[0], p[1], p[2]] = shapeOuter + 1
-#   print boardLoader.PrettyPrint(workBoard, boardMax, boardMax, boardMax)
-
-

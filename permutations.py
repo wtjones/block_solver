@@ -1,5 +1,8 @@
 
 class PermutationBuilder():
+    """Given a list of lists, produces a list of each possible
+    permutation. See unit test for an example.
+    """
 
     def __buildPermutations(self, level, things, permutation, result):
         if level < len(things):
