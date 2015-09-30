@@ -1,57 +1,24 @@
-from operator import itemgetter
 import copy
 from board_loader import *
 from shapes import shapes
 from permutations import *
 from matrix_math import *
+from board_solver import *
+
 
 matrixMath = MatrixMath()
 boardMax = 3
 
 boardLoader = BoardLoader()
 b1 = boardLoader.getBoard('tests/board-test.json')
+solver = BoardSolver()
 
 # For every cell within the board bounds, apply each rotation of every shape.
 # Rotations that fit within the board are added to the transforms array.
 
 for shape in shapes:
-    st = {}
-    for tz in range(0, b1.zMax):
-        for ty in range(0, b1.yMax):
-            for tx in range(0, b1.xMax):
-                for rotation in matrixMath.rotations:
-                    m = matrixMath.applyTranslationToMatrix(
-                        rotation, tx, ty, tz
-                    )
-
-                    # Determine if this matrix places the shape in a valid
-                    # position.
-                    valid = True
-                    tempPoints = []
-                    for point in shape['points']:
-                        p = matrixMath.transformPoint(point, m)
-
-                        # make sure point is in board
-                        if (p[0] < boardMax and
-                                p[1] < boardMax and
-                                p[2] < boardMax):
-
-                            if b1.cells[p[0], p[1], p[2]] == 0:
-                                valid = False
-                        else:
-                            valid = False
-                        tempPoints.append(p)
-
-                    if valid:
-                        # Valid transforms are hashed by their sorted points.
-                        sortedPoints = \
-                            sorted(tempPoints, key=itemgetter(0, 1, 2))
-                        pointHash = hash(str(sortedPoints))
-                        st[pointHash] = m
-
-    for m in st:
-        shape['transforms'].append(st[m])
-        print st[m]
+    st = solver.getShapeTranforms(b1, shape)
+    shape['transforms'] = st
 
     print 'shape transforms: ' + str(len(st))
 
