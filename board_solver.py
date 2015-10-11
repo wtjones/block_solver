@@ -1,10 +1,11 @@
 from matrix_math import *
 from operator import itemgetter
+from permutations import *
 
 
 class BoardSolver:
 
-    def getShapeTranforms(self, board, shape):
+    def __getShapeTranforms(self, board, shape):
         """For every cell within the board bounds, apply each
         rotation of every shape. Rotations that fit within
         the board are added to the transforms array.
@@ -54,3 +55,43 @@ class BoardSolver:
             result.append(st[m])
 
         return result
+
+    def getBoardShapeTranforms(self, board, shapes):
+        """Returns all possible transforms of each shape, indexed
+        by the same index as the shape
+        """
+        shapeTransforms = []
+        for shapeIndex, shape in enumerate(shapes):
+            #print shapeIndex
+            #print shape
+            st = self.__getShapeTranforms(board, shape)
+            #print st
+            shapeTransforms.append(st)
+        return shapeTransforms
+
+    def getBoardPermutations(self, board, shapes, shapeTransforms):
+
+        permutationInput = []
+        for shapeIndex in range(0, len(shapes)):
+            outerList = []
+            for transformIndex in range(0, len(shapeTransforms[shapeIndex])):
+                item = [shapeIndex, transformIndex]
+                outerList.append(item)
+            permutationInput.append(outerList)
+
+        print permutationInput
+        permutionBuilder = PermutationBuilder()
+        boardPermutations = permutionBuilder.getPermutations(permutationInput)
+        return boardPermutations
+#print boardPermutations
+
+
+
+   # def solveBoard(self, board, shapes, shapeTransforms, permutations):
+
+        # shapeTransforms = [];
+        # for shapeIndex, shape in enumerate(shapes):
+        #     st = solver.getShapeTranforms(b1, shape)
+        #     shapeTransforms[shapeIndex] = st
+
+

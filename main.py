@@ -13,34 +13,38 @@ boardLoader = BoardLoader()
 b1 = boardLoader.getBoard('tests/board-test.json')
 solver = BoardSolver()
 
-# For every cell within the board bounds, apply each rotation of every shape.
-# Rotations that fit within the board are added to the transforms array.
+shapeTransforms = solver.getBoardShapeTranforms(b1, shapes)
+# for shapeIndex, shape in enumerate(shapes):
+#     st = solver.getShapeTranforms(b1, shape)
+#     shapeTransforms[shapeIndex] = st
+#     
+#     
+  
+    #shape['transforms'] = st
 
-for shape in shapes:
-    st = solver.getShapeTranforms(b1, shape)
-    shape['transforms'] = st
-
-    print 'shape transforms: ' + str(len(st))
+    #print 'shape transforms: ' + str(len(st))
 
 
 # Build a list of possible permutations. 
 # Of each permutation: 
 #   First index is the index of the shape
 #   Second index is the index of the shape transform.
-permutationInput = []
+# permutationInput = []
 
-for shapeIndex in range(0, len(shapes)):
-    shape = shapes[shapeIndex]
-    outerList = []
-    for transformIndex in range(0, len(shape['transforms'])):
-        item = [shapeIndex, transformIndex]
-        outerList.append(item)
-    permutationInput.append(outerList)
 
-print permutationInput
-permutionBuilder = PermutationBuilder()
-boardPermutations = permutionBuilder.getPermutations(permutationInput)
-print len(boardPermutations)
+
+# for shapeIndex in range(0, len(shapes)):
+#     shape = shapes[shapeIndex]
+#     outerList = []
+#     for transformIndex in range(0, len(shape['transforms'])):
+#         item = [shapeIndex, transformIndex]
+#         outerList.append(item)
+#     permutationInput.append(outerList)
+
+# print permutationInput
+# permutionBuilder = PermutationBuilder()
+# boardPermutations = permutionBuilder.getPermutations(permutationInput)
+# print len(boardPermutations)
 #print boardPermutations
 
 
