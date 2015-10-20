@@ -12,10 +12,10 @@ class Board:
 
     def prettyPrint(self):
         result = ''
-        for by in range(0, self.yMax):
+        for by in range(self.yMax - 1, -1, -1):
             for bz in range(0, self.yMax):
                 for bx in range(0, self.zMax):
                     result += str(int(self.cells[bx, by, bz]))
                 result += "\n"
-            result += "\n" if by < self.yMax - 1 else ""
+            result += "\n" if by > 0 else ""
         return result

@@ -12,7 +12,7 @@ class BoardTestCase(unittest.TestCase):
 
         expected = '''\
 000
-008
+800
 000
 
 000
@@ -20,7 +20,7 @@ class BoardTestCase(unittest.TestCase):
 000
 
 000
-800
-000
+008
+088
 '''
         self.assertEqual(result, expected)
