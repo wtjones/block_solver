@@ -1,4 +1,3 @@
-import copy
 from board_loader import *
 from shapes import shapes
 from permutations import *
@@ -6,84 +5,34 @@ from matrix_math import *
 from board_solver import *
 
 
-matrixMath = MatrixMath()
-boardMax = 3
+#matrixMath = MatrixMath()
+
 
 boardLoader = BoardLoader()
-b1 = boardLoader.getBoard('tests/board-test.json')
+board = boardLoader.getBoard('boards/board-0.json')
 solver = BoardSolver()
 
-shapeTransforms = solver.getBoardShapeTranforms(b1, shapes)
-# for shapeIndex, shape in enumerate(shapes):
-#     st = solver.getShapeTranforms(b1, shape)
-#     shapeTransforms[shapeIndex] = st
-#     
-#     
-  
-    #shape['transforms'] = st
+print 'Building shape transforms of board...'
+transforms = solver.getBoardShapeTranforms(board, shapes)
 
-    #print 'shape transforms: ' + str(len(st))
+for i in range(0, len(transforms)):
+    print 'Total xforms of shape {0}: {1}'.format(i, len(transforms[i]))
 
+print 'Building possible permuations of shapes...'
+permutations = solver.getBoardPermutations(board, shapes, transforms)
+print 'Total permutations: {0}'.format(len(permutations))
+# print permutations[0]
 
-# Build a list of possible permutations. 
-# Of each permutation: 
-#   First index is the index of the shape
-#   Second index is the index of the shape transform.
-# permutationInput = []
+# print 'solving'
+# result = solver.solveBoard(board, shapes, transforms, permutations)
 
+# print 'result total:'
+# print 'numPermutations: {0}'.format(result['numPermutations'])
+# print 'numSolutions: {0}'.format(result['numSolutions'])
 
+# for i in range(0, len(result['boards'])):
+#     print ''
+#     print 'result:'
+    
+#     print result['boards'][i].prettyPrint()
 
-# for shapeIndex in range(0, len(shapes)):
-#     shape = shapes[shapeIndex]
-#     outerList = []
-#     for transformIndex in range(0, len(shape['transforms'])):
-#         item = [shapeIndex, transformIndex]
-#         outerList.append(item)
-#     permutationInput.append(outerList)
-
-# print permutationInput
-# permutionBuilder = PermutationBuilder()
-# boardPermutations = permutionBuilder.getPermutations(permutationInput)
-# print len(boardPermutations)
-#print boardPermutations
-
-
-solved = False
-permIndex = 0
-while not solved and permIndex < len(boardPermutations):
-    permutation = boardPermutations[permIndex]
-
-    workBoard = copy.deepcopy(b1) #np.copy(b1)
-    validShapes = 0
-    for shapePosition in permutation:
-        shape = shapes[shapePosition[0]]
-        m = shape['transforms'][shapePosition[1]]
-        #print transform
-
-        tempPoints = []
-        valid = True
-        for sp in shape['points']:
-            p = matrixMath.transformPoint(sp, m)
-
-            if p[0] < boardMax and p[1] < boardMax and p[2] < boardMax:
-                if workBoard.cells[p[0], p[1], p[2]] != 8:
-                    valid = False
-            else:
-                valid = False
-            tempPoints.append(p)
-
-        if valid:
-            validShapes += 1
-
-            for p in tempPoints:
-                print p
-                # mark the cells of the working board with the
-                # index of the current shape + 1
-                workBoard.cells[p[0], p[1], p[2]] = shapePosition[0] + 1
-
-    if validShapes == len(shapes):
-        print 'all valid'
-
-        print workBoard.prettyPrint()
-
-    permIndex += 1

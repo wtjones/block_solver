@@ -75,8 +75,7 @@ class BoardSolver:
                 item = [shapeIndex, transformIndex]
                 outerList.append(item)
             permutationInput.append(outerList)
-
-        print permutationInput
+            
         permutionBuilder = PermutationBuilder()
         boardPermutations = permutionBuilder.getPermutations(permutationInput)
         return boardPermutations
@@ -89,7 +88,9 @@ class BoardSolver:
         #     shapeTransforms[shapeIndex] = st
         #     
         #     
-        result = []
+        result = {}
+        result['boards'] = []
+
         print shapeTransforms[0]
         print shapeTransforms[1]
         
@@ -150,10 +151,12 @@ class BoardSolver:
 
             if validShapes == len(shapes):
                 print 'all valid'
-                result.append(workBoard)
+                result['boards'].append(workBoard)
                 print workBoard.prettyPrint()
 
             permIndex += 1
+        result['numPermutations'] = len(boardPermutations)
+        result['numSolutions'] = len(result['boards'])
         return result
 
     def pointInBoard(self, board, point):

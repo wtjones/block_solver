@@ -1,3 +1,4 @@
+import itertools
 
 class PermutationBuilder():
     """Given a list of lists, produces a list of each possible
@@ -18,5 +19,9 @@ class PermutationBuilder():
 
     def getPermutations(self, items):
         result = []
-        self.__buildPermutations(0, items, [], result)
+        # self.__buildPermutations(0, items, [], result)
+        # return result
+        for element in itertools.product(*items):
+            result.append(list(element))
+
         return result

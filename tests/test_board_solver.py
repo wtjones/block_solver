@@ -71,11 +71,14 @@ class BoardSolverCase(unittest.TestCase):
         result = solver.solveBoard(board, shapes, transforms, permutations)
 
         print 'result total:'
-        print len(result)
-        for i in range(0, len(result)):
+        print 'numPermutations: {0}'.format(result['numPermutations'])
+        print 'numSolutions: {0}'.format(result['numSolutions'])
+        
+        for i in range(0, len(result['boards'])):
             print ''
             print 'result:'
-            print result[i].prettyPrint()
+            
+            print result['boards'][i].prettyPrint()
 
 
         # print ''
