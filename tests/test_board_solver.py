@@ -6,6 +6,10 @@ from matrix_math import *
 
 
 class BoardSolverCase(unittest.TestCase):
+
+    # def __init__(self):
+    #     self._solvedBoards = []
+
     def test_getBoardShapeTransforms(self):
 
         # Arrange
@@ -35,9 +39,6 @@ class BoardSolverCase(unittest.TestCase):
         self.assertEqual(p3, [1, 1, 1])
 
     def test_solver(self):
-
-        # Arrange
-
         shapes = []
         # x*x
         # x**
@@ -54,36 +55,20 @@ class BoardSolverCase(unittest.TestCase):
 
         boardLoader = BoardLoader()
         solver = BoardSolver()
-        #permutationBuilder = PermutationBuilder()
+       
         board = boardLoader.getBoard('tests/board-tiny-test.json')
-        
-        transforms = solver.getBoardShapeTranforms(board, shapes)
-        print 'transforms'
-        print transforms[0]
-        print 'transforms'
-        print transforms[1]
-        
-        permutations = solver.getBoardPermutations(board, shapes, transforms)
-        print 'permutations: ' + str(len(permutations))
-        print permutations[0]
-        
-        print 'solving'
-        result = solver.solveBoard(board, shapes, transforms, permutations)
 
-        print 'result total:'
-        print 'numPermutations: {0}'.format(result['numPermutations'])
-        print 'numSolutions: {0}'.format(result['numSolutions'])
-        
-        for i in range(0, len(result['boards'])):
-            print ''
-            print 'result:'
-            
-            print result['boards'][i].prettyPrint()
+        self._solvedBoards = []
+        self._numRejected = 0
+        solver.solveBoard(board, shapes, self.submitProgress)
+        print 'Rejected: {0}'.format(self._numRejected)
+        self.assertEqual(len(self._solvedBoards), 3)
 
+    def submitProgress(self, solvedBoard, rejectedBoard, progressBoard, shapeIndex):
+        if solvedBoard:
+            self._solvedBoards.append(solvedBoard)
+            print 'Progress solved:'
+            print solvedBoard.prettyPrint()
 
-        # print ''
-        # print board.prettyPrint()
-        # print result
-        # print 'test'
-
-        #self.assertEqual(len(result), 0)
+        if rejectedBoard:
+            self._numRejected += 1

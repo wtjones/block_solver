@@ -9,7 +9,7 @@ shapes = []
 #
 shape = {'transforms': []}
 shape['points'] = [[0, 0, 0], [-1, 0, 0], [0, 1, 0], [1, 0, 0]]
-# shapes.append(shape)
+shapes.append(shape)
 
 # #  **
 # #  *

@@ -6,6 +6,10 @@ from permutations import *
 
 class BoardSolver:
 
+    def __init__(self):
+        self._matrixMath = MatrixMath()
+
+
     def __getShapeTranforms(self, board, shape):
         """For every cell within the board bounds, apply each
         rotation of every shape. Rotations that fit within
@@ -59,10 +63,7 @@ class BoardSolver:
         """
         shapeTransforms = []
         for shapeIndex, shape in enumerate(shapes):
-            #print shapeIndex
-            #print shape
             st = self.__getShapeTranforms(board, shape)
-            #print st
             shapeTransforms.append(st)
         return shapeTransforms
 
@@ -80,84 +81,60 @@ class BoardSolver:
         boardPermutations = permutionBuilder.getPermutations(permutationInput)
         return boardPermutations
 
-    def solveBoard(self, board, shapes, shapeTransforms, boardPermutations):
 
-        # shapeTransforms = [];
-        # for shapeIndex, shape in enumerate(shapes):
-        #     st = solver.getShapeTranforms(b1, shape)
-        #     shapeTransforms[shapeIndex] = st
-        #     
-        #     
-        result = {}
-        result['boards'] = []
+    def __solveBoardShape(self, board, shapes, shapeIndex, callback):
+        callback(None, None, board, shapeIndex)
 
-        print shapeTransforms[0]
-        print shapeTransforms[1]
-        
-        matrixMath = MatrixMath()
-
-        solved = False
-        permIndex = 0
-        while not solved and permIndex < len(boardPermutations):
-            permutation = boardPermutations[permIndex]
-            print 'permutation'
-            print permutation
-            
-            # Create a copy of the board to modify by placing
-            # shapes.
-            workBoard = copy.deepcopy(board) #np.copy(b1)
-            validShapes = 0
-            #for shapeIndex in range(0, len(permutation)):
-            #    shape = shapes[shapeIndex]
-             #   shapePosition = permutation[shapeIndex]
-            for shapePosition in permutation:
-                print 'shapPosition:'
-                print shapePosition
-
-                #print shapePosition[1]
-                shapeIndex = shapePosition[0]
-                shapeTransformIndex = shapePosition[1]
-                shape = shapes[shapeIndex]
-                print 'shape'
-                print shape
-                
-                m = shapeTransforms[shapeIndex][shapeTransformIndex]
-
-                print 'transform'
-                print m
-                
-
-                tempPoints = []
-                valid = True
-                for sp in shape['points']:
-                    p = matrixMath.transformPoint(sp, m)
-
-                    # make sure point is in board
-                    if self.pointInBoard(board, p):
-                        if workBoard.cells[p[0], p[1], p[2]] != 8:
-                            valid = False
-                    else:
-                        valid = False
-                    tempPoints.append(p)
+        for shapeIndex in range(shapeIndex, len(shapes)):
+            shape = shapes[shapeIndex]
+            workBoard = copy.deepcopy(board)
+            shapeTransforms = self.__getShapeTranforms(board, shape)
+            for st in enumerate(shapeTransforms):
+                workBoard = copy.deepcopy(board)
+                valid = self.applyTransformToBoard(
+                    workBoard,
+                    shape,
+                    shapeIndex,
+                    st[1]
+                )
 
                 if valid:
-                    validShapes += 1
+                    isSolved = False
+                    if shapeIndex == len(shapes) - 1:
+                        isSolved = workBoard.isSolved()
+                        if isSolved:
+                            callback(workBoard, None, None, shapeIndex)
+                    if shapeIndex < len(shapes) - 1:
+                        self.__solveBoardShape(
+                            workBoard, shapes, shapeIndex + 1, callback
+                        )
+                else:
+                    callback(None, workBoard, None, shapeIndex)
 
-                    for p in tempPoints:
-                        print p
-                        # mark the cells of the working board with the
-                        # index of the current shape + 1
-                        workBoard.cells[p[0], p[1], p[2]] = shapePosition[0] + 1
+    def solveBoard(self, board, shapes, callback):
+        self.__solveBoardShape(board, shapes, 0, callback)
 
-            if validShapes == len(shapes):
-                print 'all valid'
-                result['boards'].append(workBoard)
-                print workBoard.prettyPrint()
+    def applyTransformToBoard(self, board, shape, shapeIndex, transform):
 
-            permIndex += 1
-        result['numPermutations'] = len(boardPermutations)
-        result['numSolutions'] = len(result['boards'])
-        return result
+        tempPoints = []
+        valid = True
+        for sp in shape['points']:
+            p = self._matrixMath.transformPoint(sp, transform)
+
+            # make sure point is in board
+            if self.pointInBoard(board, p):
+                if board.cells[p[0], p[1], p[2]] != 8:
+                    valid = False
+            else:
+                valid = False
+            tempPoints.append(p)
+
+        if valid:
+            for p in tempPoints:
+                # mark the cells of the working board with the
+                # index of the current shape + 1
+                board.cells[p[0], p[1], p[2]] = shapeIndex + 1
+        return valid
 
     def pointInBoard(self, board, point):
         return (point[0] >= 0 and point[0] < board.xMax and
