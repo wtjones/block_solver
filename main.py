@@ -8,12 +8,14 @@ from board_solver import *
 startTime = time.time()
 solvedBoards = []
 numRejected = 0
+numProgress = 0
 
 
 def submitProgress(solvedBoard, rejectedBoard, progressBoard, shapeIndex):
-    global numRejected, solvedBoards, startTime
-    if shapeIndex == 0:
-        print 'shapeindex: {0}'.format(shapeIndex)
+    global numRejected, solvedBoards, startTime, numProgress
+    numProgress += 1
+    if shapeIndex == 0 or  1== 1:#numProgress % 1000 == 0:
+        print 'progress count: {0}. shapeindex: {1}'.format(numProgress, shapeIndex)
         print 'Elapsed: {0}'.format(time.time() - startTime)
     if solvedBoard:
         solvedBoards.append(solvedBoard)
@@ -24,17 +26,18 @@ def submitProgress(solvedBoard, rejectedBoard, progressBoard, shapeIndex):
         exit(0)
     if rejectedBoard:
         numRejected += 1
-        if numRejected % 1000 == 1:
-            print 'Rejected: {0}. ShapeIndex: {1}. Elapsed: {2}'.format(
-                    numRejected,
-                    shapeIndex,
-                    time.time() - startTime,
-            )
+        #if numRejected % 1000 == 1:
+        print 'Rejected: {0}. ShapeIndex: {1}. Elapsed: {2}'.format(
+                numRejected,
+                shapeIndex,
+                time.time() - startTime,
+        )
+        print rejectedBoard.prettyPrint()
 
 
 def solve():
     boardLoader = BoardLoader()
-    board = boardLoader.getBoard('boards/board-0.json')
+    board = boardLoader.getBoard('boards/board-16.json')
     solver = BoardSolver()
     solvedBoards = []
     startTime = time.time()

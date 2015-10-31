@@ -9,7 +9,6 @@ class BoardSolver:
     def __init__(self):
         self._matrixMath = MatrixMath()
 
-
     def __getShapeTranforms(self, board, shape):
         """For every cell within the board bounds, apply each
         rotation of every shape. Rotations that fit within
@@ -81,41 +80,41 @@ class BoardSolver:
         boardPermutations = permutionBuilder.getPermutations(permutationInput)
         return boardPermutations
 
-
     def __solveBoardShape(self, board, shapes, shapeIndex, callback):
         callback(None, None, board, shapeIndex)
-
-        for shapeIndex in range(shapeIndex, len(shapes)):
-            shape = shapes[shapeIndex]
+        shape = shapes[shapeIndex]
+        
+        shapeTransforms = self.__getShapeTranforms(board, shape)
+        for tIndex, st in enumerate(shapeTransforms):
             workBoard = copy.deepcopy(board)
-            shapeTransforms = self.__getShapeTranforms(board, shape)
-            for st in enumerate(shapeTransforms):
-                workBoard = copy.deepcopy(board)
-                valid = self.applyTransformToBoard(
-                    workBoard,
-                    shape,
-                    shapeIndex,
-                    st[1]
-                )
+           
+            valid = self.applyTransformToBoard(
+                workBoard,
+                shape,
+                shapeIndex,
+                st
+            )
 
-                if valid:
-                    isSolved = False
-                    if shapeIndex == len(shapes) - 1:
-                        isSolved = workBoard.isSolved()
-                        if isSolved:
-                            callback(workBoard, None, None, shapeIndex)
-                    if shapeIndex < len(shapes) - 1:
-                        self.__solveBoardShape(
-                            workBoard, shapes, shapeIndex + 1, callback
-                        )
-                else:
-                    callback(None, workBoard, None, shapeIndex)
+            if valid:
+                isSolved = False
+                if shapeIndex == len(shapes) - 1:
+                    isSolved = workBoard.isSolved()
+                    if isSolved:
+                        callback(workBoard, None, None, shapeIndex)
+                        return
+                    else:
+                        # Report rejected
+                        callback(None, workBoard, None, shapeIndex)
+                if shapeIndex < len(shapes) - 1:
+                    self.__solveBoardShape(
+                        workBoard, shapes, shapeIndex + 1, callback
+                    )
+                
 
     def solveBoard(self, board, shapes, callback):
         self.__solveBoardShape(board, shapes, 0, callback)
 
     def applyTransformToBoard(self, board, shape, shapeIndex, transform):
-
         tempPoints = []
         valid = True
         for sp in shape['points']:

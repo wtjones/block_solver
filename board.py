@@ -13,7 +13,7 @@ class Board:
     def isSolved(self):
         result = True
         for by in range(0, self.yMax):
-            for bz in range(0, self.yMax):
+            for bz in range(0, self.zMax):
                 for bx in range(0, self.zMax):
                     if int(self.cells[bx, by, bz]) == 8:
                         result = False
@@ -22,7 +22,7 @@ class Board:
     def prettyPrint(self):
         result = ''
         for by in range(self.yMax - 1, -1, -1):
-            for bz in range(0, self.yMax):
+            for bz in range(0, self.zMax):
                 for bx in range(0, self.zMax):
                     result += str(int(self.cells[bx, by, bz]))
                 result += "\n"
