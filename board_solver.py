@@ -17,6 +17,7 @@ class BoardSolver:
         self._solvedBoards = []
         self._board = board
         self._shapes = shapes
+        self._maxSolutions = max
         self._progressCallback = progressCallback
         self._solvedCallback = solvedCallback
         self._shapeTransforms = self.getBoardShapeTranforms(
@@ -100,6 +101,8 @@ class BoardSolver:
 
     def __solveBoardShape(self, board, shapeIndex):
         self.__handleProgressCallback(board, shapeIndex)
+        if len(self._solvedBoards) == self._maxSolutions:
+            return
         shape = self._shapes[shapeIndex]
 
         shapeTransforms = []
@@ -135,7 +138,8 @@ class BoardSolver:
                     workBoard, shapeIndex + 1
                 )
 
-    def solveBoard(self):
+    def solveBoard(self, maxSolutions=max):
+        self._maxSolutions = maxSolutions
         self.__solveBoardShape(self._board, 0)
 
     def applyTransformToBoard(self, board, shape, shapeIndex, transform):

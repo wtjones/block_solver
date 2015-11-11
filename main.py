@@ -1,4 +1,5 @@
 import time
+import argparse
 from board_loader import *
 from shapes import shapes
 from permutations import *
@@ -36,8 +37,25 @@ def onSolved(solvedBoard):
 
 def solve():
     global startTime, solver, numProgress, defaultBoardFileName
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--board',
+        type=int,
+        default=0,
+        help='The board number. See the boards folder. Defaults to 0.'
+    )
+    parser.add_argument(
+        '--maxSolutions',
+        type=int,
+        default=max,
+        help='Stop solving after reaching this count.'
+    )
+    args = parser.parse_args()
+
+    boardFileName = 'boards/board-{0}.json'.format(args.board)
     boardLoader = BoardLoader()
-    board = boardLoader.getBoard(defaultBoardFileName)
+    print 'Loading {0}'.format(boardFileName)
+    board = boardLoader.getBoard(boardFileName)
     print 'Solver init of board:'
     print board.prettyPrint()
     print '...'
@@ -51,7 +69,7 @@ def solve():
         )
 
     print 'Solving...'
-    solver.solveBoard()
+    solver.solveBoard(args.maxSolutions)
     print 'Total solutions: {0}'.format(len(solver.solvedBoards))
     print 'Elapsed: {0}'.format(time.time() - startTime)
 

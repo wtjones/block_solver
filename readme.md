@@ -1,5 +1,12 @@
 
 
+Usage
+-----
+
+```
+python main.py --board 0 --maxSolutions 10
+```
+
 
 
 Board Format
