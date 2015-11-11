@@ -1,3 +1,4 @@
+import pdb
 import copy
 from operator import itemgetter
 from matrix_math import *
@@ -8,6 +9,10 @@ class BoardSolver:
 
     def __init__(self):
         self._matrixMath = MatrixMath()
+        self._shapeTransforms = []
+
+    def shapeTransforms(self):
+        return self._shapeTransforms
 
     def __getShapeTranforms(self, board, shape):
         """For every cell within the board bounds, apply each
@@ -49,7 +54,9 @@ class BoardSolver:
                             sortedPoints = \
                                 sorted(tempPoints, key=itemgetter(0, 1, 2))
                             pointHash = hash(str(sortedPoints))
-                            st[pointHash] = m
+                            st[pointHash] = {
+                                'matrix': m, 'points': sortedPoints
+                            }
 
         for m in st:
             result.append(st[m])
@@ -84,56 +91,56 @@ class BoardSolver:
         callback(None, None, board, shapeIndex)
         shape = shapes[shapeIndex]
         
-        shapeTransforms = self.__getShapeTranforms(board, shape)
+        shapeTransforms = [] # = self.__getShapeTranforms(board, shape)
+        for st in self._shapeTransforms[shapeIndex]:
+            valid = True
+            for point in st['points']:
+                if board.cells[point[0], point[1], point[2]] != 8:
+                    valid = False
+
+            if valid:
+                shapeTransforms.append(st)
+
         for tIndex, st in enumerate(shapeTransforms):
             workBoard = copy.deepcopy(board)
            
-            valid = self.applyTransformToBoard(
+            self.applyTransformToBoard(
                 workBoard,
                 shape,
                 shapeIndex,
                 st
             )
 
-            if valid:
-                isSolved = False
-                if shapeIndex == len(shapes) - 1:
-                    isSolved = workBoard.isSolved()
-                    if isSolved:
-                        callback(workBoard, None, None, shapeIndex)
-                        return
-                    else:
-                        # Report rejected
-                        callback(None, workBoard, None, shapeIndex)
-                if shapeIndex < len(shapes) - 1:
-                    self.__solveBoardShape(
-                        workBoard, shapes, shapeIndex + 1, callback
-                    )
-                
+        
+            isSolved = False
+            if shapeIndex == len(shapes) - 1:
+                isSolved = workBoard.isSolved()
+                if isSolved:
+                    callback(workBoard, None, None, shapeIndex)
+                    return
+                else:
+                    # Report rejected
+                    callback(None, workBoard, None, shapeIndex)
+            if shapeIndex < len(shapes) - 1:
+                self.__solveBoardShape(
+                    workBoard, shapes, shapeIndex + 1, callback
+                )
 
     def solveBoard(self, board, shapes, callback):
+        self._shapeTransforms = self.getBoardShapeTranforms(
+            board, shapes
+        )
+
+        for i in range(0, len(self._shapeTransforms)):
+            print 'Total xforms of shape {0}: {1}'.format(i, len(self._shapeTransforms[i]))
+
+
+
         self.__solveBoardShape(board, shapes, 0, callback)
 
     def applyTransformToBoard(self, board, shape, shapeIndex, transform):
-        tempPoints = []
-        valid = True
-        for sp in shape['points']:
-            p = self._matrixMath.transformPoint(sp, transform)
-
-            # make sure point is in board
-            if self.pointInBoard(board, p):
-                if board.cells[p[0], p[1], p[2]] != 8:
-                    valid = False
-            else:
-                valid = False
-            tempPoints.append(p)
-
-        if valid:
-            for p in tempPoints:
-                # mark the cells of the working board with the
-                # index of the current shape + 1
-                board.cells[p[0], p[1], p[2]] = shapeIndex + 1
-        return valid
+        for p in transform['points']:
+            board.cells[p[0], p[1], p[2]] = shapeIndex + 1
 
     def pointInBoard(self, board, point):
         return (point[0] >= 0 and point[0] < board.xMax and

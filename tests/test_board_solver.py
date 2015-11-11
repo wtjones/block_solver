@@ -28,9 +28,9 @@ class BoardSolverCase(unittest.TestCase):
         result = solver.getBoardShapeTranforms(board, shapes)
 
         # Assert
-        p1 = matrixMath.transformPoint(shape['points'][0], result[0][0])
-        p2 = matrixMath.transformPoint(shape['points'][1], result[0][0])
-        p3 = matrixMath.transformPoint(shape['points'][2], result[0][0])
+        p1 = matrixMath.transformPoint(shape['points'][0], result[0][0]['matrix'])
+        p2 = matrixMath.transformPoint(shape['points'][1], result[0][0]['matrix'])
+        p3 = matrixMath.transformPoint(shape['points'][2], result[0][0]['matrix'])
 
         # one possible transform
         self.assertEqual(len(result[0]), 1)
