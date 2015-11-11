@@ -1,4 +1,3 @@
-import pdb
 import copy
 from operator import itemgetter
 from matrix_math import *
@@ -7,12 +6,38 @@ from permutations import *
 
 class BoardSolver:
 
-    def __init__(self):
+    def __init__(
+        self,
+        board, shapes,
+        progressCallback=None,
+        solvedCallback=None
+    ):
         self._matrixMath = MatrixMath()
         self._shapeTransforms = []
+        self._solvedBoards = []
+        self._board = board
+        self._shapes = shapes
+        self._progressCallback = progressCallback
+        self._solvedCallback = solvedCallback
+        self._shapeTransforms = self.getBoardShapeTranforms(
+            board, shapes
+        )
 
+    @property
     def shapeTransforms(self):
         return self._shapeTransforms
+
+    @property
+    def solvedBoards(self):
+        return self._solvedBoards
+
+    def __handleProgressCallback(self, board, shapeIndex):
+        if self._progressCallback:
+            self._progressCallback(board, shapeIndex)
+
+    def __handleSolvedCallback(self, board):
+        if self._solvedCallback:
+            self._solvedCallback(board)
 
     def __getShapeTranforms(self, board, shape):
         """For every cell within the board bounds, apply each
@@ -73,25 +98,11 @@ class BoardSolver:
             shapeTransforms.append(st)
         return shapeTransforms
 
-    def getBoardPermutations(self, board, shapes, shapeTransforms):
+    def __solveBoardShape(self, board, shapeIndex):
+        self.__handleProgressCallback(board, shapeIndex)
+        shape = self._shapes[shapeIndex]
 
-        permutationInput = []
-        for shapeIndex in range(0, len(shapes)):
-            outerList = []
-            for transformIndex in range(0, len(shapeTransforms[shapeIndex])):
-                item = [shapeIndex, transformIndex]
-                outerList.append(item)
-            permutationInput.append(outerList)
-            
-        permutionBuilder = PermutationBuilder()
-        boardPermutations = permutionBuilder.getPermutations(permutationInput)
-        return boardPermutations
-
-    def __solveBoardShape(self, board, shapes, shapeIndex, callback):
-        callback(None, None, board, shapeIndex)
-        shape = shapes[shapeIndex]
-        
-        shapeTransforms = [] # = self.__getShapeTranforms(board, shape)
+        shapeTransforms = []
         for st in self._shapeTransforms[shapeIndex]:
             valid = True
             for point in st['points']:
@@ -103,7 +114,7 @@ class BoardSolver:
 
         for tIndex, st in enumerate(shapeTransforms):
             workBoard = copy.deepcopy(board)
-           
+
             self.applyTransformToBoard(
                 workBoard,
                 shape,
@@ -111,32 +122,21 @@ class BoardSolver:
                 st
             )
 
-        
             isSolved = False
-            if shapeIndex == len(shapes) - 1:
+            if shapeIndex == len(self._shapes) - 1:
                 isSolved = workBoard.isSolved()
                 if isSolved:
-                    callback(workBoard, None, None, shapeIndex)
+                    self._solvedBoards.append(workBoard)
+                    self.__handleSolvedCallback(workBoard)
                     return
-                else:
-                    # Report rejected
-                    callback(None, workBoard, None, shapeIndex)
-            if shapeIndex < len(shapes) - 1:
+
+            if shapeIndex < len(self._shapes) - 1:
                 self.__solveBoardShape(
-                    workBoard, shapes, shapeIndex + 1, callback
+                    workBoard, shapeIndex + 1
                 )
 
-    def solveBoard(self, board, shapes, callback):
-        self._shapeTransforms = self.getBoardShapeTranforms(
-            board, shapes
-        )
-
-        for i in range(0, len(self._shapeTransforms)):
-            print 'Total xforms of shape {0}: {1}'.format(i, len(self._shapeTransforms[i]))
-
-
-
-        self.__solveBoardShape(board, shapes, 0, callback)
+    def solveBoard(self):
+        self.__solveBoardShape(self._board, 0)
 
     def applyTransformToBoard(self, board, shape, shapeIndex, transform):
         for p in transform['points']:
