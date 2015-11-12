@@ -11,7 +11,6 @@ solvedBoards = []
 numRejected = 0
 numProgress = 0
 solver = None
-defaultBoardFileName = 'boards/board-0.json'
 
 
 def onProgress(board, shapeIndex):
@@ -35,22 +34,23 @@ def onSolved(solvedBoard):
     print 'Elapsed: {0}'.format(time.time() - startTime)
 
 
-def solve():
-    global startTime, solver, numProgress, defaultBoardFileName
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--board',
-        type=int,
-        default=0,
-        help='The board number. See the boards folder. Defaults to 0.'
-    )
-    parser.add_argument(
-        '--maxSolutions',
-        type=int,
-        default=max,
-        help='Stop solving after reaching this count.'
-    )
-    args = parser.parse_args()
+def countUniqueBoards(boards):
+    solutionHash = {}
+    for i, solvedBoard in enumerate(solver.solvedBoards):
+        solutionHash[hash(solvedBoard.prettyPrint())] = solvedBoard
+    return len(solutionHash)
+
+
+def writeResults(filePath):
+    with open(filePath, 'w') as f:
+        for i, solvedBoard in enumerate(solver.solvedBoards):
+            f.write('Solution: {0}\n---------------\n'.format(i))
+            f.write(solvedBoard.prettyPrint())
+            f.write('===============\n')
+
+
+def solve(args):
+    global startTime, solver, numProgress
 
     boardFileName = 'boards/board-{0}.json'.format(args.board)
     boardLoader = BoardLoader()
@@ -73,11 +73,31 @@ def solve():
     print 'Total solutions: {0}'.format(len(solver.solvedBoards))
     print 'Elapsed: {0}'.format(time.time() - startTime)
 
-    solutionHash = {}
-    for i, solvedBoard in enumerate(solver.solvedBoards):
-        solutionHash[hash(solvedBoard.prettyPrint())] = solvedBoard
+    print 'Total unique solutions: {0}'.format(
+        countUniqueBoards(solver.solvedBoards)
+    )
+    if args.resultsFile:
+        writeResults(args.resultsFile)
 
-    print 'Total unique solutions: {0}'.format(len(solutionHash))
 
 if __name__ == '__main__':
-    solve()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--board',
+        type=int,
+        default=0,
+        help='The board number. See the boards folder. Defaults to 0.'
+    )
+    parser.add_argument(
+        '--maxSolutions',
+        type=int,
+        default=max,
+        help='Stop solving after reaching this count.'
+    )
+    parser.add_argument(
+        '--resultsFile',
+        help='Write solutions to a file.'
+    )
+
+    args = parser.parse_args()
+    solve(args)

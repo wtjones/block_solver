@@ -4,7 +4,7 @@ Usage
 -----
 
 ```
-python main.py --board 0 --maxSolutions 10
+python main.py --board 0 --maxSolutions 10 --resultsFile out.txt
 ```
 
 
