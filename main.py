@@ -44,7 +44,7 @@ def countUniqueBoards(boards):
 def writeResults(filePath):
     with open(filePath, 'w') as f:
         for i, solvedBoard in enumerate(solver.solvedBoards):
-            f.write('Solution: {0}\n---------------\n'.format(i))
+            f.write('Solution: {0}\n---------------\n'.format(i + 1))
             f.write(solvedBoard.prettyPrint())
             f.write('===============\n')
 
