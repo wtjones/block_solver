@@ -1,5 +1,5 @@
 import unittest
-from permutations import *
+from block_solver.permutations import *
 
 
 class PermutationTestCase(unittest.TestCase):

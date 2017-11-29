@@ -1,6 +1,6 @@
 import unittest
-from board import *
-from board_loader import *
+from block_solver.board import *
+from block_solver.board_loader import *
 
 
 class BoardTestCase(unittest.TestCase):

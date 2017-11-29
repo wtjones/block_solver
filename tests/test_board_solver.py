@@ -1,8 +1,8 @@
 import unittest
-from board import *
-from board_solver import *
-from board_loader import *
-from matrix_math import *
+from block_solver.board import *
+from block_solver.board_solver import *
+from block_solver.board_loader import *
+from block_solver.matrix_math import *
 
 
 class BoardSolverCase(unittest.TestCase):

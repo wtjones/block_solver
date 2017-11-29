@@ -1,5 +1,5 @@
 import unittest
-from matrix_math import *
+from block_solver.matrix_math import *
 
 
 class MatrixMathTestCase(unittest.TestCase):
