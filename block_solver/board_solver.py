@@ -1,7 +1,7 @@
 import copy
 from operator import itemgetter
-from matrix_math import *
-from permutations import *
+from .matrix_math import *
+from .permutations import *
 
 
 class BoardSolver:

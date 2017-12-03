@@ -1,10 +1,10 @@
 import time
 import argparse
-from board_loader import *
-from shapes import shapes
-from permutations import *
-from matrix_math import *
-from board_solver import *
+from .board_loader import *
+from .shapes import shapes
+from .permutations import *
+from .matrix_math import *
+from .board_solver import *
 
 startTime = time.time()
 solvedBoards = []
@@ -17,21 +17,21 @@ def onProgress(board, shapeIndex):
     global startTime, numProgress
     numProgress += 1
     if shapeIndex == 0 or numProgress % 10000 == 0:
-        print 'progress count: {0}. shapeindex: {1}'.format(
+        print('progress count: {0}. shapeindex: {1}'.format(
             numProgress, shapeIndex
-        )
-        print 'Elapsed: {0}'.format(time.time() - startTime)
+        ))
+        print('Elapsed: {0}'.format(time.time() - startTime))
 
 
 def onSolved(solvedBoard):
     global startTime
 
-    print 'Solution found:'
-    print solvedBoard.prettyPrint()
-    print 'Current solution count: {0}'.format(
+    print('Solution found:')
+    print(solvedBoard.prettyPrint())
+    print('Current solution count: {0}'.format(
         len(solver.solvedBoards)
-    )
-    print 'Elapsed: {0}'.format(time.time() - startTime)
+    ))
+    print('Elapsed: {0}'.format(time.time() - startTime))
 
 
 def countUniqueBoards(boards):
@@ -54,28 +54,28 @@ def solve(args):
 
     boardFileName = 'boards/board-{0}.json'.format(args.board)
     boardLoader = BoardLoader()
-    print 'Loading {0}'.format(boardFileName)
+    print('Loading {0}'.format(boardFileName))
     board = boardLoader.getBoard(boardFileName)
-    print 'Solver init of board:'
-    print board.prettyPrint()
-    print '...'
+    print('Solver init of board:')
+    print(board.prettyPrint())
+    print('...')
     startTime = time.time()
 
     solver = BoardSolver(board, shapes, onProgress, onSolved)
-    print 'Elapsed: {0}'.format(time.time() - startTime)
+    print('Elapsed: {0}'.format(time.time() - startTime))
     for i in range(0, len(solver.shapeTransforms)):
-        print 'Total possible transforms of shape {0}: {1}'.format(
+        print('Total possible transforms of shape {0}: {1}'.format(
             i, len(solver.shapeTransforms[i])
-        )
+        ))
 
-    print 'Solving...'
+    print('Solving...')
     solver.solveBoard(args.maxSolutions)
-    print 'Total solutions: {0}'.format(len(solver.solvedBoards))
-    print 'Elapsed: {0}'.format(time.time() - startTime)
+    print('Total solutions: {0}'.format(len(solver.solvedBoards)))
+    print('Elapsed: {0}'.format(time.time() - startTime))
 
-    print 'Total unique solutions: {0}'.format(
+    print('Total unique solutions: {0}'.format(
         countUniqueBoards(solver.solvedBoards)
-    )
+    ))
     if args.resultsFile:
         writeResults(args.resultsFile)
 
